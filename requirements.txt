@@ -1,0 +1,4 @@
+opencv-python-headless
+openai-whisper
+openai>=1.0.0
+requests

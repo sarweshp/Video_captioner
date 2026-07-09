@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.git
+.env
+input/
+output/
+*.mp4
+*.wav
+README.md

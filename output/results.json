@@ -1,0 +1,20 @@
+[
+  {
+    "task_id": "v1",
+    "captions": {
+      "formal": "A timelapse captures continuous vehicular traffic flowing along a multi-lane urban street, framed by high-rise residential buildings and autumn foliage under warm daylight.",
+      "sarcastic": "Ah yes, nothing captures autumn's peaceful beauty like 1,000 cars desperately trying to be somewhere else.",
+      "humorous_tech": "Cars, buses, and trucks streaming down multi-lane pipelines at peak bandwidth\u2014traffic lights syncing their semaphore flags to keep the flow from deadlocking. The high-rises stack up like server racks while autumn trees render their seasonal patch in warm RGB. Peak hour just maxed out the city's CPU, and the sidewalk threads are running nonstop.",
+      "humorous_non_tech": "The trees are out here gracefully dropping leaves like it's autumn yoga, meanwhile the cars are in full panic mode trying to drop into their lanes before the light changes. Nature's autumn aesthetic vs. humanity's Monday morning energy."
+    }
+  },
+  {
+    "task_id": "v2",
+    "captions": {
+      "formal": "An orange tabby kitten sits among leafy branches in a sunlit garden before slowly walking forward toward the camera with a curious expression.",
+      "sarcastic": "Striding toward you with the confidence of a creature whose life peak was a sunbeam nap.",
+      "humorous_tech": "Boot sequence complete \u2014 this curious orange tabby is now rendering itself straight toward the camera, frame by adorable frame. The foliage server's running smooth, and curiosity.exe is executing at full CPU. Zero buffering needed, just pure sunlit purr-ocessing power.",
+      "humorous_non_tech": "Tiny orange explorer doing recon on the weird clicking noise. Step one: look cute. Step two: walk closer. Step three: secure snacks. Nature documentary? Influencer shoot? Either way, I'm here for it."
+    }
+  }
+]
