@@ -23,10 +23,10 @@ COPY main.py video_captioner.py caption_generator.py ./
 
 # No API key is injected by the judging environment, so it must be baked in
 # at build time. Replace with your real key before building.
-# ENV OPENROUTER_API_KEY="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"
+
 # ENV OPENROUTER_SCENE_MODEL="nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
 # ENV OPENROUTER_CAPTION_MODEL="nvidia/nemotron-3-nano-30b-a3b"
-ENV FIREWORKS_API_KEY="fw_HwtZXsdZbSVJ8cCuFgVDyw"
+ENV FIREWORKS_API_KEY=""
 ENV SCENE_MODEL="accounts/fireworks/models/minimax-m3"
 ENV CAPTION_MODEL="accounts/fireworks/models/minimax-m3"
 
