@@ -2,19 +2,73 @@
   {
     "task_id": "v1",
     "captions": {
-      "formal": "A timelapse captures continuous vehicular traffic flowing along a multi-lane urban street, framed by high-rise residential buildings and autumn foliage under warm daylight.",
-      "sarcastic": "Ah yes, nothing captures autumn's peaceful beauty like 1,000 cars desperately trying to be somewhere else.",
-      "humorous_tech": "Cars, buses, and trucks streaming down multi-lane pipelines at peak bandwidth\u2014traffic lights syncing their semaphore flags to keep the flow from deadlocking. The high-rises stack up like server racks while autumn trees render their seasonal patch in warm RGB. Peak hour just maxed out the city's CPU, and the sidewalk threads are running nonstop.",
-      "humorous_non_tech": "The trees are out here gracefully dropping leaves like it's autumn yoga, meanwhile the cars are in full panic mode trying to drop into their lanes before the light changes. Nature's autumn aesthetic vs. humanity's Monday morning energy."
+      "humorous_non_tech": "Time-lapse traffic: cars buzzing like caffeinated bees through the intersection, buses lumbering past like they're late for a nap, and trees dropping golden leaves like nature's confetti. The city's daily symphony of 'go, stop, go'\u2014set to the soundtrack of Monday morning coffee.",
+      "humorous_tech": "Urban traffic hitting peak throughput\u2014cars packet-switch through the intersection while traffic lights toggle their binary states. Autumn's golden leaves serve as nature's cache, and those buses? Pure bulk data transfers cruising the main highway.",
+      "formal": "An elevated, wide-angle time-lapse captures a bustling multi-lane city street in autumn, framed by high-rise residential buildings and trees with yellow foliage, as a continuous stream of cars and buses flows through the intersection under bright sunlight, illustrating the dynamic pace of urban life.",
+      "sarcastic": "The trees spent weeks turning yellow just to be ignored by a blur of brake lights and bus exhaust. Nature's masterpiece, admired at 60mph through a dirty windshield. Truly, autumn's finest audience."
     }
   },
   {
     "task_id": "v2",
     "captions": {
-      "formal": "An orange tabby kitten sits among leafy branches in a sunlit garden before slowly walking forward toward the camera with a curious expression.",
-      "sarcastic": "Striding toward you with the confidence of a creature whose life peak was a sunbeam nap.",
-      "humorous_tech": "Boot sequence complete \u2014 this curious orange tabby is now rendering itself straight toward the camera, frame by adorable frame. The foliage server's running smooth, and curiosity.exe is executing at full CPU. Zero buffering needed, just pure sunlit purr-ocessing power.",
-      "humorous_non_tech": "Tiny orange explorer doing recon on the weird clicking noise. Step one: look cute. Step two: walk closer. Step three: secure snacks. Nature documentary? Influencer shoot? Either way, I'm here for it."
+      "sarcastic": "Oh sure, just act like you own the whole forest. Bold move for a creature the size of a teacup who can't even reach the kitchen counter without a strategy.",
+      "humorous_tech": "Initializing curious.exe: this orange tabby boots up from idle, executes walk.exe straight toward the camera, and pings the viewer with locked-on eye contact. Dappled sunlight? Just premium rendering. Looks like nature's cutest little kernel is fully online.",
+      "humorous_non_tech": "Orange tabby kitten strutting forward like he's the garden's tiny landlord, paw raised mid-gesture as if to say, 'We need to discuss your unauthorized use of this dirt path.' The confidence is absolutely unhinged.",
+      "formal": "An orange tabby kitten sits on a dirt path surrounded by bushes, vines, and leafy branches in a sunlit outdoor setting. The kitten rises from its resting position, walks forward toward the camera, and lifts a paw while maintaining direct eye contact with the viewer."
+    }
+  },
+  {
+    "task_id": "v3",
+    "captions": {
+      "formal": "A young woman sits at a white desk in a brightly lit, modern open-plan office, focused intently on her computer monitor while typing. The professional workspace includes a laptop, mouse, headphones, and cables, with potted plants and additional workstations visible in the background.",
+      "sarcastic": "Headphones on, monitor glowing, fingers poised over the keyboard\u2014the universal office costume for 'please don't talk to me.' The plants are thriving; she is merely surviving until lunch.",
+      "humorous_tech": "Her focus is rendering in real-time\u2014no buffering, zero lag, just pure CPU power clocking in serious productivity. Fully hardwired into her monitor, she's running today's algorithm at optimal GHz, with cables plugged in and headphones on standby.",
+      "humorous_non_tech": "Headphones on, eyes locked, typing like the next great email is about to drop. Meanwhile, the potted plant in the background is the only one in the office with a healthy work-life balance."
+    }
+  },
+  {
+    "task_id": "v4",
+    "captions": {
+      "formal": "A slow aerial pan reveals a vast mountain range characterized by rocky peaks and dense green vegetation, with a hazy city skyline visible in the distance beneath a clear sky.",
+      "humorous_non_tech": "Looks like the mountains are showing off their best staycation vibes while the city plays peek-a-boo through the haze. Even these rocky giants need their fuzzy green sweaters for that perfect filter. Nature's original skyscrapers don't need Wi-Fi to have a better view than you!",
+      "humorous_tech": "Our aerial drone streams nature's raw computing power\u2014jagged mountain peaks acting as ancient processors, dense forests serving as lush green cache memory. The camera pans in real-time, while the distant city slowly buffers through atmospheric haze, finally rendering its skyline.",
+      "sarcastic": "Such majestic mountains\u2014and beyond that haze, a city desperately trying to matter. Nature's polite 'thank you' really says 'stay over there.'"
+    }
+  },
+  {
+    "task_id": "v5",
+    "captions": {
+      "sarcastic": "Absolutely nothing screams 'inner peace' like watching waves commit to the exact same routine for eternity. The cliffs are judging. Thank you. Thank you.",
+      "humorous_non_tech": "The ocean keeps rolling in like that overenthusiastic guest who won't take the hint\u2014'just gonna leave this foam here real quick.' Meanwhile, the cliffs stand there silently judging every wave's technique.",
+      "humorous_tech": "The ocean's running its infinite render loop\u2014wave packets streaming onto the pebble cache, sea foam rendering fresh with every cycle. The cliffs serve as nature's firewall, while the tide's garbage collection keeps the shoreline clean. Zero downtime, full throughput.",
+      "formal": "Ocean waves continuously roll onto a dark pebble beach, producing white sea foam that washes across the shoreline. Tall, steep cliffs covered in lush green vegetation frame the coastline, creating a tranquil, untouched coastal landscape under soft natural light."
+    }
+  },
+  {
+    "task_id": "v6",
+    "captions": {
+      "formal": "Numerous pedestrians traverse the wide zebra-striped crosswalks of a bustling multi-lane urban intersection while a continuous flow of cars, buses, and trucks navigate the thoroughfare, framed by tall commercial buildings displaying large billboards and advertisements characteristic of a major metropolitan hub.",
+      "humorous_tech": "Shibuya's intersection hits maximum CPU load\u2014thousands of human data packets streaming through zebra-striped ethernet cables while server buses and download trucks queue for bandwidth. The billboards? Aggressive pop-up ads this overloaded network refuses to close.",
+      "humorous_non_tech": "Tokyo intersections are basically the world's most aggressive game of Frogger, except everyone wins and the billboards are yelling 'LOOK AT ME' like desperate influencers. The cars? Just sitting there, quietly judging our life choices.",
+      "sarcastic": "Thousands of people cross paths in perfect chaos, and the only thing anyone says is 'thank you.' Shibuya really mastered the art of multitasking \u2014 dodging traffic, ignoring deadlines, and being polite, all at once."
+    }
+  },
+  {
+    "task_id": "v7",
+    "captions": {
+      "formal": "A chef in a striped apron carefully dices zucchini into uniform cubes on a wooden cutting board in an outdoor setting, with fresh lettuce, a red-capped bottle, and a frying pan arranged nearby during the focused culinary preparation.",
+      "sarcastic": "Meditation apps could never compete. Nothing unlocks inner peace quite like reducing a defenseless zucchini into hundreds of geometrically identical cubes of pure, diced serenity.",
+      "humorous_tech": "Running a clean dicing loop on fresh zucchini data\u2014the chef's knife processes each cube with zero latency. The striped apron acts as a lightweight firewall, while the frying pan queues up for its next render cycle.",
+      "humorous_non_tech": "Turning a zucchini into a pile of tiny green dice, one zen slice at a time. The striped apron is my uniform, the knife my fidget spinner, and that red-capped bottle? The reward for finishing this meditative cube-making."
+    }
+  },
+  {
+    "task_id": "v8",
+    "captions": {
+      "formal": "A shirtless male athlete in blue shorts sprints across the red track of an outdoor athletics stadium, moving steadily from left to right. The empty blue and white stands and surrounding trees create a quiet, focused atmosphere as the runner exits the frame.",
+      "humorous_tech": "Single-thread mode engaged: one lone process sprints through the pipeline at max clock speed, no background tasks running in those idle stands\u2014just pure overclocked performance exiting the render queue.",
+      "sarcastic": "Thousands of seats, zero spectators\u2014because nothing fuels a personal best like sprinting desperately from absolutely no one. Even the trees refused to clap for this sold-out performance.",
+      "humorous_non_tech": "When you sprint across the track so fast even the empty stadium seats can't keep up with your speed. That runner came, saw, and conquered the lane markings before anyone could say 'lap time'\u2014leaving behind nothing but dust and an audience of zero."
     }
   }
 ]
