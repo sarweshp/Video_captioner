@@ -36,6 +36,34 @@ The agent supports the following styles:
 
 ---
 
+# 🚀 Live Demo
+
+Try the project without setting up the repository:
+
+**Hugging Face Space:**  
+https://huggingface.co/spaces/sarweshp/Video_captioner-4_styles
+
+### What you can do
+
+- Upload or provide a **public video URL** (up to **2 minutes** long).
+- The application automatically:
+  - Extracts representative video frames
+  - Transcribes the audio using Whisper
+  - Builds a structured scene understanding
+  - Generates captions in **four different styles**
+  - Uses an LLM-based judge and refinement pipeline to improve caption quality
+
+### Supported Caption Styles
+
+- 📄 **Formal**
+- 😏 **Sarcastic**
+- 💻 **Humorous Tech**
+- 😂 **Humorous Non-Tech**
+
+The interface returns all four captions together, allowing users to compare different writing styles for the same video.
+
+> **Note:** The demo currently supports videos up to **2 minutes** in duration. Longer videos may exceed the processing limits of the hosted demo.
+
 # Pipeline Overview
 
 ```
