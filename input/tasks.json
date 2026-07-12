@@ -8,5 +8,35 @@
     "task_id": "v2",
     "video_url": "https://storage.googleapis.com/amd-hackathon-clips/13825391-uhd_3840_2160_30fps.mp4",
     "styles": ["formal", "sarcastic", "humorous_tech", "humorous_non_tech"]
+  },
+  {
+    "task_id": "v3",
+    "video_url": "https://storage.googleapis.com/amd-hackathon-clips/3044693-uhd_3840_2160_24fps.mp4",
+    "styles": ["formal", "sarcastic", "humorous_tech", "humorous_non_tech"]
+  },
+  {
+    "task_id": "v4",
+    "video_url": "https://storage.googleapis.com/amd-hackathon-clips/3121327-uhd_2560_1440_24fps.mp4",
+    "styles": ["formal", "sarcastic", "humorous_tech", "humorous_non_tech"]
+  },
+  {
+    "task_id": "v5",
+    "video_url": "https://storage.googleapis.com/amd-hackathon-clips/5404543-hd_1920_1080_24fps.mp4",
+    "styles": ["formal", "sarcastic", "humorous_tech", "humorous_non_tech"]
+  },
+  {
+    "task_id": "v6",
+    "video_url": "https://storage.googleapis.com/amd-hackathon-clips/2697636-uhd_1920_1440_30fps.mp4",
+    "styles": ["formal", "sarcastic", "humorous_tech", "humorous_non_tech"]
+  },
+  {
+    "task_id": "v7",
+    "video_url": "https://storage.googleapis.com/amd-hackathon-clips/7963468-uhd_2560_1440_25fps.mp4",
+    "styles": ["formal", "sarcastic", "humorous_tech", "humorous_non_tech"]
+  },
+  {
+    "task_id": "v8",
+    "video_url": "https://storage.googleapis.com/amd-hackathon-clips/8533913-uhd_2560_1440_25fps.mp4",
+    "styles": ["formal", "sarcastic", "humorous_tech", "humorous_non_tech"]
   }
 ]
