@@ -4,10 +4,11 @@ import base64
 import tempfile
 import subprocess
 import time
+import requests
+from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict, Any, Optional
 
 import cv2
-import whisper
 from openai import OpenAI
 
 
@@ -22,15 +23,18 @@ class VideoCaptioner:
         self,
         api_key: Optional[str] = None,
         model: str = "google/gemma-4-31b-it:free",
-        max_frames: int = 10,
+        max_frames: int = 30,
         frame_interval: float = 1.0,
         adaptive_sampling: bool = True,
         max_retries: int = 7,
         whisper_model_size: str = "base",
+        audio_api: Optional[str] = None,
     ):
-        self.api_key = api_key or os.environ.get("FIREWORKS_API_KEY")
+        self.api_key = api_key or os.environ.get("FIREWORKS_API_KEY") 
         if not self.api_key:
-            raise ValueError("Fireworks API key must be provided or set as env var")
+            raise ValueError("FIREWORKS_API_KEY must be provided or set as env var")
+        
+        self.audio_api = audio_api or os.environ.get("OPENROUTER_API_KEY")
         self.model = model
         self.max_frames = max_frames
         self.frame_interval = frame_interval
@@ -40,11 +44,10 @@ class VideoCaptioner:
         self.client = OpenAI(
             api_key=self.api_key,
             base_url="https://api.fireworks.ai/inference/v1",
+            #base_url="https://router.huggingface.co/v1",
         )
 
-        # Loaded once per process; reused across all tasks/clips.
-        self.whisper_model = whisper.load_model(whisper_model_size)
-
+        
     # ------------------------------------------------------------------ #
     # Audio
     # ------------------------------------------------------------------ #
@@ -69,8 +72,54 @@ class VideoCaptioner:
         return audio_path
 
     def transcribe_audio(self, audio_path: str) -> str:
-        result = self.whisper_model.transcribe(audio_path)
-        return result["text"].strip()
+            with open(audio_path, "rb") as f:
+                base64_audio = base64.b64encode(f.read()).decode("utf-8")
+
+            response = requests.post(
+                url="https://openrouter.ai/api/v1/audio/transcriptions",
+                headers={
+                    "Authorization": f"Bearer {self.audio_api}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "openai/whisper-large-v3-turbo",
+                    "input_audio": {
+                        "data": base64_audio,
+                        "format": "wav",
+                    },
+                },
+                timeout=300,
+            )
+
+            response.raise_for_status()
+
+            result = response.json()
+            return result.get("text", "").strip()
+
+
+
+    def get_transcript(self, video_path: str) -> str:
+        """Extract audio and transcribe it, self-contained so it can be run
+        in a worker thread alongside frame extraction."""
+        audio_path = None
+        transcript = ""
+        try:
+            audio_path = self.extract_audio(video_path)
+            print("Audio extracted.")
+        except Exception as e:
+            print(f"Audio extraction failed (proceeding without audio): {e}")
+            return transcript
+
+        if audio_path and os.path.exists(audio_path):
+            try:
+                transcript = self.transcribe_audio(audio_path)
+                print(f"Transcription: {transcript[:200]}...")
+            except Exception as e:
+                print(f"Transcription failed: {e}")
+            finally:
+                os.unlink(audio_path)
+
+        return transcript
 
     # ------------------------------------------------------------------ #
     # Frames
@@ -143,7 +192,7 @@ class VideoCaptioner:
                 "You are a video captioning assistant. Given a series of video frames and an "
                 "audio transcript, produce a neutral JSON description with EXACTLY these keys: "
                 "'objects' (list of strings), 'actions' (list of strings), 'scene' (string), "
-                "'mood' (string), 'summary' (string, 1-2 sentences). "
+                "'mood' (string), 'summary' (string, 2-4 sentences). "
                 "Respond with ONLY the raw JSON object. No markdown, no code fences, no extra text."
             )
         }
@@ -172,8 +221,8 @@ class VideoCaptioner:
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
-            max_tokens=1200,
-            temperature=0.2,
+            max_tokens=3000,
+            temperature=0.9,
             #extra_body={"reasoning": {"enabled": False}},
         )
         content = response.choices[0].message.content
@@ -225,7 +274,7 @@ class VideoCaptioner:
                 last_error = e
                 print(f"[scene-json] attempt {attempt}/{self.max_retries} failed: {e}")
                 if attempt < self.max_retries:
-                    time.sleep(min(2 * attempt, 10))
+                    time.sleep(min(0.1 * attempt, 10))
 
         print(f"[scene-json] all {self.max_retries} attempts failed, using fallback. Last error: {last_error}")
         return {
@@ -242,24 +291,16 @@ class VideoCaptioner:
     def process(self, video_path: str) -> Dict[str, Any]:
         print(f"Processing video: {video_path}")
 
-        audio_path = None
-        transcript = ""
-        try:
-            audio_path = self.extract_audio(video_path)
-            print("Audio extracted.")
-        except Exception as e:
-            print(f"Audio extraction failed (proceeding without audio): {e}")
+        # Audio transcription (ffmpeg + whisper) and frame extraction
+        # (opencv) are independent -- neither depends on the other's output
+        # -- so run them concurrently instead of back-to-back.
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            transcript_future = executor.submit(self.get_transcript, video_path)
+            frames_future = executor.submit(self.extract_frames, video_path)
 
-        if audio_path and os.path.exists(audio_path):
-            try:
-                transcript = self.transcribe_audio(audio_path)
-                print(f"Transcription: {transcript[:200]}...")
-            except Exception as e:
-                print(f"Transcription failed: {e}")
-            finally:
-                os.unlink(audio_path)
+            transcript = transcript_future.result()
+            frames_b64 = frames_future.result()
 
-        frames_b64 = self.extract_frames(video_path)
         print(f"Extracted {len(frames_b64)} frames.")
 
         messages = self.build_messages(transcript, frames_b64)
