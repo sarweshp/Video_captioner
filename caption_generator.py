@@ -1,9 +1,12 @@
 import json
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Any
 
 from openai import OpenAI
+
+from caption_judge import evaluate_caption, refine_caption, select_best_caption
 
 # Keys here MUST match the style strings that show up in tasks.json
 # ("formal", "sarcastic", "humorous_tech", "humorous_non_tech").
@@ -85,8 +88,10 @@ def generate_caption(
     system_prompt = (
         "You are a creative video caption writer. Produce captions that match the requested "
         "tone while staying true to the given scene details. "
+        "Maintain the length of written caption between 25 to 60 words. "
         'Respond with ONLY a raw JSON object of the form {"caption": "your caption here"}. '
         "No markdown, no code fences, no extra commentary."
+        
     )
 
     user_prompt = f"""{STYLE_PROMPTS[style]}
@@ -96,7 +101,7 @@ Scene details:
 
 Respond with JSON: {{"caption": "..."}}"""
 
-    temp = 0.4 if style == "formal" else 0.8
+    temp = 0.8 if style == "formal" else 0.7
 
     last_error = None
     for attempt in range(1, max_retries + 1):
@@ -108,7 +113,7 @@ Respond with JSON: {{"caption": "..."}}"""
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=temp,
-                max_tokens=1000,
+                max_tokens=2000,
                 timeout=30,
             )
 
@@ -131,19 +136,186 @@ Respond with JSON: {{"caption": "..."}}"""
     return f"[Fallback] {style.replace('_', ' ').title()} caption for the described scene."
 
 
+def generate_and_judge_caption(
+    style: str,
+    scene_text: str,
+    gen_client: OpenAI,
+    gen_model: str,
+    judge_client: OpenAI,
+    judge_model: str,
+    refine_client: OpenAI,
+    refine_model: str,
+    max_retries: int = 7,
+    enable_judge: bool = True,
+    max_refine_iterations: int = 2,
+) -> Dict[str, Any]:
+    """
+    Implements:
+
+        Generate Caption -> Judge -> PASS -> Return
+                               |
+                              FAIL
+                               |
+                               v
+                            Refiner (sees every prior attempt + feedback)
+                               |
+                               v
+                          Judge again
+                               |
+                               v
+                    iterations exhausted?
+                       No -> Refine again
+                       Yes -> Best Caption Selector -> Final Caption
+
+    The judge gives a single PASS/FAIL verdict (see caption_judge.py for why: four
+    separate numeric scores added variance without changing the decision). On FAIL,
+    the refiner is shown the FULL history of attempts and their feedback -- not just
+    the latest one -- so it can't oscillate between reintroducing the same couple of
+    mistakes. If no attempt passes before the refinement budget runs out, a dedicated
+    selector call picks the strongest candidate among ALL attempts made (the last
+    attempt is not assumed to be the best one -- refining to fix one problem can
+    introduce another).
+
+    gen_client/gen_model, judge_client/judge_model, and refine_client/refine_model
+    are independent so each stage can use a different model.
+
+    Returns: {"caption": str, "judged": bool, "passed": bool | None,
+              "refine_iterations": int, "attempts": [{"caption": str, "feedback": str}, ...]}
+    """
+    caption = generate_caption(style, scene_text, gen_client, gen_model, max_retries)
+
+    result: Dict[str, Any] = {
+        "caption": caption,
+        "judged": False,
+        "passed": None,
+        "refine_iterations": 0,
+        "attempts": [],
+    }
+
+    if not enable_judge:
+        return result
+
+    attempts: List[Dict[str, str]] = []
+    current_caption = caption
+
+    for iteration in range(max_refine_iterations + 1):
+        verdict = evaluate_caption(style, scene_text, current_caption, judge_client, judge_model, max_retries)
+        result["judged"] = True
+        attempts.append({"caption": current_caption, "feedback": verdict["feedback"]})
+
+        if verdict["passed"]:
+            result["caption"] = current_caption
+            result["passed"] = True
+            result["refine_iterations"] = iteration
+            result["attempts"] = attempts
+            return result
+
+        if iteration >= max_refine_iterations:
+            break  # refinement budget exhausted, nothing has passed yet
+
+        print(f"[judge:{style}] attempt {iteration + 1} FAILED, refining "
+              f"({iteration + 1}/{max_refine_iterations}). feedback={verdict['feedback']!r}")
+        current_caption = refine_caption(
+            style,
+            STYLE_PROMPTS[style],
+            scene_text,
+            attempts,
+            refine_client,
+            refine_model,
+            max_retries,
+        )
+
+    # Budget exhausted with no passing attempt: don't just keep the last one --
+    # ask the judge to pick the strongest candidate out of everything tried.
+    print(f"[judge:{style}] exhausted refine budget with no pass, selecting best of "
+          f"{len(attempts)} attempts.")
+    best_caption = select_best_caption(style, scene_text, attempts, judge_client, judge_model, max_retries)
+    result["caption"] = best_caption
+    result["passed"] = False
+    result["refine_iterations"] = max_refine_iterations
+    result["attempts"] = attempts
+    return result
+
+
 def generate_all_captions(
     json_data: Dict[str, Any],
     client: OpenAI,
     model: str,
     styles: List[str],
     max_retries: int = 7,
-) -> Dict[str, str]:
-    """Generate captions only for the styles requested for this task."""
+    judge_client: OpenAI = None,
+    judge_model: str = None,
+    refine_client: OpenAI = None,
+    refine_model: str = None,
+    enable_judge: bool = False,
+    max_refine_iterations: int = 2,
+    include_judge_metadata: bool = False,
+) -> Dict[str, Any]:
+    """Generate captions for all requested styles concurrently, optionally passing
+    each one through an LLM judge + refinement loop before it's accepted.
+
+    Each style is an independent network call to the model, so they are
+    fired off in parallel threads instead of sequentially. This turns
+    (N styles * per-call latency) into roughly one call's worth of wall time.
+
+    When enable_judge=True, judge_client/judge_model and refine_client/refine_model
+    default to `client`/`model` (the caption-generation ones) if not supplied, but
+    can be set independently to use different models for drafting vs. judging vs.
+    refining.
+
+    Returns {style: caption_str, ...} normally, or, if include_judge_metadata=True,
+    {style: {"caption": str, "passed": bool, "refine_iterations": int, ...}, ...}.
+    """
     scene_text = format_scene_data(json_data)
-    captions = {}
+    valid_styles = []
     for style in styles:
         if style not in STYLE_PROMPTS:
             print(f"[caption] unknown style '{style}', skipping")
             continue
-        captions[style] = generate_caption(style, scene_text, client, model, max_retries=max_retries)
+        valid_styles.append(style)
+
+    captions: Dict[str, Any] = {}
+    if not valid_styles:
+        return captions
+
+    j_client = judge_client or client
+    j_model = judge_model or model
+    r_client = refine_client or client
+    r_model = refine_model or model
+
+    with ThreadPoolExecutor(max_workers=len(valid_styles)) as executor:
+        future_to_style = {
+            executor.submit(
+                generate_and_judge_caption,
+                style,
+                scene_text,
+                client,
+                model,
+                j_client,
+                j_model,
+                r_client,
+                r_model,
+                max_retries,
+                enable_judge,
+                max_refine_iterations,
+            ): style
+            for style in valid_styles
+        }
+        for future in as_completed(future_to_style):
+            style = future_to_style[future]
+            try:
+                outcome = future.result()
+                captions[style] = outcome if include_judge_metadata else outcome["caption"]
+            except Exception as e:
+                # generate_caption/generate_and_judge_caption already retry
+                # internally and return a fallback string on failure, so this
+                # is a last-resort guard.
+                print(f"[caption:{style}] unexpected error in thread: {e}")
+                fallback = f"[Fallback] {style.replace('_', ' ').title()} caption for the described scene."
+                captions[style] = (
+                    {"caption": fallback, "judged": False, "passed": None, "refine_iterations": 0, "attempts": []}
+                    if include_judge_metadata
+                    else fallback
+                )
+
     return captions
